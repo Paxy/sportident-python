@@ -1829,7 +1829,35 @@ class SIReaderControl(SIReader):
             raise SIReaderException('Unexpected command %s received' % hex(byte2int(c[0])))
         
         return punches
+	    
+    def autosend_punch(self, timeout=0):
+        """Reads autoosend punches.
+        @return: (stationnr, cardnr, punchtime)
+        """
+
+        if not self.proto_config['ext_proto']:
+            raise SIReaderException('This command only supports stations in "Extended Protocol" '
+                                    'mode. Switch mode first')
+
+        if not self.proto_config['auto_send']:
+            raise SIReaderException('This command only supports stations in "Autosend" '
+                                    'mode. Switch mode first')
+
+        punches = []
+        while True:
+            try:
+                c = self._read_command(timeout = None)
+            except SIReaderTimeout:
+                break 
         
+            if c[0] == SIReader.C_TRANS_REC:
+
+                punches= (self.get_station_code(),self._decode_cardnr(c[1][SIReader.T_CN:SIReader.T_CN+4]), self._decode_time(c[1][SIReader.T_TIME:SIReader.T_TIME+2])) 
+        else:
+            raise SIReaderException('Unexpected command %s received' % hex(byte2int(c[0])))
+        
+        return punches
+	    
     def _read_punch(self, offset):
         """Reads a punch from the SI Stations backup memory.
         @param offset: Position in the backup memory to read
