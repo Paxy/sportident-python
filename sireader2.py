@@ -1825,9 +1825,6 @@ class SIReaderControl(SIReader):
                 self._next_offset = cur_offset + SIReader.REC_LEN
             punches.append( (self._decode_cardnr(c[1][SIReader.T_CN:SIReader.T_CN+4]), 
                              self._decode_time(c[1][SIReader.T_TIME:SIReader.T_TIME+2])) )
-        else:
-            raise SIReaderException('Unexpected command %s received' % hex(byte2int(c[0])))
-        
         return punches
 	    
     def autosend_punch(self, timeout=0):
@@ -1853,9 +1850,6 @@ class SIReaderControl(SIReader):
             if c[0] == SIReader.C_TRANS_REC:
 
                 punches= (self.get_station_code(),self._decode_cardnr(c[1][SIReader.T_CN:SIReader.T_CN+4]), self._decode_time(c[1][SIReader.T_TIME:SIReader.T_TIME+2])) 
-        else:
-            raise SIReaderException('Unexpected command %s received' % hex(byte2int(c[0])))
-        
         return punches
 	    
     def _read_punch(self, offset):
